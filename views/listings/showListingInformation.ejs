@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listing Info</title>
+</head>
+<body>
+    <h3>Listing Details :</h3>
+    <ul>
+      <li><%= listingData.title %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit title</button></form></li>
+      <!-- onclick="fetch('/listings/<%= listingData._id %>/edit', {method: 'GET'} -->
+       <!--<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit title</button></form> -->
+        <!-- <a href="/listings/<%=listingData._id%>/edit"> Edit ltitle</a> -->
+      <li><%= listingData.description %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit description</button></form></li>
+      <li>&#8377; <%= listingData.price.toLocaleString("en-IN") %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit price</button></form></li>
+      <li><%= listingData.location %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit location</button></form></li>
+      <li><%= listingData.country %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit country</button></form></li>
+    </ul>
+    <br><br>
+    <form action="/listings/<%= listingData._id %>" id="deleteForm">
+        <button type="submit">Delete this listing</button>
+    </form>
+    <script>
+        const deleteForm = document.getElementById("deleteForm");
+
+        deleteForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const listingId = "<%= params.id %>";
+            try {
+                const response = await fetch(`/listings/${listingId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (response.ok) {
+                // Redirect or show success message
+                const result = await response.json();
+                console.log("Update successful:", result);
+                window.location.href = '/listings'; 
+            } else {
+                alert("Failed to update listing.");
+            }
+        } catch (error) {
+            console.error("Error sending PATCH request:", error);
+        }
+    });
+    </script>
+</body>
+</html>
