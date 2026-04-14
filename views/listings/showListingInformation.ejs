@@ -7,7 +7,7 @@
        <!--<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit title</button></form> -->
         <!-- <a href="/listings/<%=listingData._id%>/edit"> Edit ltitle</a> -->
       <li><%= listingData.description %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit description</button></form></li>
-      <li>&#8377; <%= listingData.price.toLocaleString("en-IN") %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit price</button></form></li>
+      <li>&#8377; <%= listingData.price ? listingData.price.toLocaleString("en-IN") : "N/A" %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit price</button></form></li>
       <li><%= listingData.location %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit location</button></form></li>
       <li><%= listingData.country %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit country</button></form></li>
     </ul>

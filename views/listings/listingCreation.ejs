@@ -1,32 +1,49 @@
 <% layout("/layouts/boilerplate") -%>
 <body>
-    <h2>Create a new listing for your property</h2>
+    <br><br>
+    <h3>Create a new listing for your property</h3>
     <form action="/listings/createListing" method="post" id="createForm">
-        <div>
-            <label for="titleInput">Enter the title for your property: </label>
-            <input type="text" name="titleInput" id="titleInput">
+        <div class="mb-3">
+            <b><label for="titleInput" class="form-label">Title</label></b>
+            <input type="text" name="titleInput" id="titleInput" class="form-control" placeholder="Enter the title for your property">
         </div>
-        <div>
-            <label for="descInput">Write a description about your property: </label>
-            <textarea name="descInput" id="descInput" cols="40" rows="2" placeholder="Write some things about your property..."></textarea>
+        <div class="mb-3">
+            <b><label for="descInput" class="form-label">Description </label></b>
+            <textarea 
+                name="descInput" 
+                id="descInput" 
+                class="form-control"
+                cols="50" 
+                rows="2" 
+                placeholder="Write some things about your property..."></textarea>
         </div>
-        <div>
-            <label for="priceInput">Enter a per night price for your property (INR): </label>
-            <input type="number" id="priceInput" name="priceInput" min="0" step="0.01" placeholder="0.00">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <b><label for="priceInput" class="form-label">Enter a per night price for your property (INR) </label></b>
+                <input 
+                    type="number" 
+                    id="priceInput" 
+                    class="form-control"
+                    name="priceInput" 
+                    min="0" step="0.01" 
+                    placeholder="0.00">
+            </div>
+            <div class="col-md-8">
+                <b><label for="countryInput" class="form-label">Country</label></b>
+                <select name="countryInput" id="countryInput"  class="form-control">
+                    <option value="">Select a country...</option>
+                    <% countries.forEach(function(name) { %>
+                        <option value="<%= name %>"><%= name %></option>
+                    <% }); %>
+                </select>
+            </div>
         </div>
-        <div>
-            <label for="locationInput">Enter the rough location of the property</label>
-            <input type="text" name="locationInput" id="locationInput">
+        <div class="mb-3">
+            <b><label for="locationInput" class="form-label">Location</label></b>
+            <input type="text" name="locationInput" id="locationInput"  class="form-control" placeholder="Enter the rough location of the property">
         </div>
-        <div>
-            <label for="countryInput">Enter the country your property is in:</label>
-            <select name="countryInput" id="countryInput">
-                <option value="">Select a country...</option>
-                <% countries.forEach(function(name) { %>
-                    <option value="<%= name %>"><%= name %></option>
-                <% }); %>
-            </select>
-        </div>
-        <button  type="submit">Create the listing</button>
+        <br>
+        <button type="submit" class="btn btn-outline-dark">Create the listing</button>
     </form>
+    <br><br><br>
 </body>

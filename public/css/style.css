@@ -1,3 +1,16 @@
+body {
+    font-family: "Plus Jakarta Sans", sans-serif !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1;
+}
+
+/* Navbar */
+
 .navbar {
     height: 6rem;
 }
@@ -10,6 +23,8 @@
 .nav-link {
     color: #222222 !important;
 }
+
+/* Footer */
 
 footer {
     display: flex;
@@ -58,4 +73,64 @@ footer {
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 50%;
     box-shadow: 0 0 0 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Cards */
+.row a {
+    text-decoration: none;
+}
+
+.card {
+    border: none;
+    margin-bottom: 2rem;
+
+}
+
+.card-img-top {
+    border-radius: 1rem;
+    width: 100%;
+    object-fit: cover;
+
+}
+
+.card-body {
+    padding: 0;
+}
+
+/* Flex box */
+.row {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: space-evenly;
+    align-content: center;
+
+    flex-wrap: wrap;
+    row-gap: 3rem;
+    /* gap: 1rem; */
+}
+
+.card {
+    flex-shrink: 1;
+    min-width: 200px;
+}
+
+/* Card hover effect */
+.card-img-overlay {
+    opacity: 0;
+}
+
+.card-img-overlay:hover {
+    opacity: 0.2;
+    background-color: white;
+}
+
+/* Create listing page */
+.btn-outline-dark {
+    border-color: #fe424d;
+    color: #fe424d;
+}
+
+.btn-outline-dark:hover {
+    border-color: #fe424d;
+    background-color: #fe424d;
 }
