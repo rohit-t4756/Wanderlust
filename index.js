@@ -78,7 +78,7 @@ app.get("/listings/:id/edit", async(request, response) => {
     const listingData = await Listing.findById(request.params.id);
 
     const country_list = Object.values(countries).map(c => c.name).sort();
-    response.render("listings/editListingForm.ejs", {params: request.params, listingData: listingData, countries: country_list});
+    response.render("listings/editListingForm.ejs", {params: request.params, listing: listingData, countries: country_list});
     // response.send("Request recived on ")
 })
 
