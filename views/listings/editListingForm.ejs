@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Listing <%= params.id %></title>
-</head>
+<% layout("/layouts/boilerplate") -%>
 <body>
     <h2>Edit the listing for your property</h2>
     <form action="/listings/<%= params.id %>/edit" id="editForm">
@@ -75,4 +69,3 @@
     });
     </script>
 </body>
-</html>

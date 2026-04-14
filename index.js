@@ -1,12 +1,15 @@
 const express = require("express");
 const app = express();
 const Listing = require("./models/listingSchema");
+const ejsMate = require("ejs-mate");
 
 const path = require("path");
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "/views/listings"));
+app.set("views", path.join(__dirname, "/views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.engine('ejs', ejsMate);
+app.use(express.static(path.join(__dirname, "/public")));
 
 // Get the server up and running.
 const port = 8080;
@@ -37,21 +40,15 @@ async function main() {
 // Index Route: Show all the listings.
 app.get("/listings", async (request, response) => {
     const listingData = await Listing.find({});
-    response.render("allListings.ejs", {listingData});
-})
-
-// Show Route: Show information for one listing.
-app.get("/listings/:id", async (request, response) => {
-    const listingData = await Listing.findById(request.params.id);
-    response.render("showListingInformation.ejs", {listingData: listingData, params: request.params})
+    response.render("listings/allListings.ejs", {listingData});
 })
 
 // New Listing Route: Present a form to create a new listing.
 const { countries } = require('countries-list');
 const { request } = require("http");
-app.post("/listings/new", (request, response) => {
+app.get("/listings/new", (request, response) => {
     const country_list = Object.values(countries).map(c => c.name).sort();
-    response.render("listingCreation.ejs", {countries: country_list});
+    response.render("listings/listingCreation.ejs", {countries: country_list});
 })
 
 // Create Route: Create a new listing and add it to the DB.
@@ -69,12 +66,19 @@ app.post("/listings/createListing", async(request, response) => {
     response.redirect("/listings");
 })
 
+
+// Show Route: Show information for one listing.
+app.get("/listings/:id", async (request, response) => {
+    const listingData = await Listing.findById(request.params.id);
+    response.render("listings/showListingInformation.ejs", {listingData: listingData, params: request.params})
+})
+
 // Edit Route: Send the edit form
 app.get("/listings/:id/edit", async(request, response) => {
     const listingData = await Listing.findById(request.params.id);
 
     const country_list = Object.values(countries).map(c => c.name).sort();
-    response.render("editListingForm.ejs", {params: request.params, listingData: listingData, countries: country_list});
+    response.render("listings/editListingForm.ejs", {params: request.params, listingData: listingData, countries: country_list});
     // response.send("Request recived on ")
 })
 
