@@ -1,6 +1,6 @@
 <% layout("/layouts/boilerplate") -%>
 <body>
-    <h1>All listings</h1>
+    <h1 class="display-5" >All listings</h1>
     <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-xs-1">
         <% for (let listing of listingData) { %>
             <a href="/listings/<%= listing._id %>">

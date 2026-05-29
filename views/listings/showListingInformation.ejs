@@ -1,20 +1,41 @@
 <% layout("/layouts/boilerplate") -%>
 <body>
-    <h3>Listing Details :</h3>
-    <ul>
-      <li><%= listingData.title %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit title</button></form></li>
-      <!-- onclick="fetch('/listings/<%= listingData._id %>/edit', {method: 'GET'} -->
-       <!--<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit title</button></form> -->
-        <!-- <a href="/listings/<%=listingData._id%>/edit"> Edit ltitle</a> -->
-      <li><%= listingData.description %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit description</button></form></li>
-      <li>&#8377; <%= listingData.price ? listingData.price.toLocaleString("en-IN") : "N/A" %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit price</button></form></li>
-      <li><%= listingData.location %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit location</button></form></li>
-      <li><%= listingData.country %>&nbsp;&nbsp;<form action="/listings/<%=listingData._id%>/edit" method="get"><button type="submit" >Edit country</button></form></li>
-    </ul>
-    <br><br>
-    <form action="/listings/<%= listingData._id %>" id="deleteForm">
-        <button type="submit">Delete this listing</button>
-    </form>
+    <div class="row showBox mt-4">
+        <div class="col-10"> 
+            
+            <h3><%= listing.title %></h3>
+            <img 
+                class="showListingImg mb-3" 
+                src="<%= listing.image.url %>" 
+                alt="<%= listing.image.filename %>">
+            
+            <div class="row">
+                
+                <div class="col-6">
+                    <p id="description" style="opacity: 0.9;"><%= listing.description %></p>
+                </div>
+                
+                <div class="col-6 d-flex justify-content-center">
+                    <div class="card showPriceCard">
+                        <div class="card-body priceDabba">
+                            <b><p class="card-text" style="font-weight: 600;">&#8377;<%= listing.price %> for 1 night</p></b>
+                            <p class="card-text location-text" style="font-weight: 300; font-size: 0.85rem;">Located in: <%= listing.location %>,&nbsp;<%= listing.country %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form action="/listings/<%=listing._id%>/edit" method="get" class="mb-2">
+                <button type="submit" class="btn btn-outline-dark">Edit this listing</button>
+            </form>
+            <form action="/listings/<%= listing._id %>" id="deleteForm">
+                <button type="submit" class="btn btn-outline-dark">Delete this listing</button>
+            </form>
+
+        </div> 
+    </div>
+
+    
+    
     <script>
         const deleteForm = document.getElementById("deleteForm");
 

@@ -2,11 +2,16 @@
 <body>
     <br><br>
     <h3>Create a new listing for your property</h3>
-    <form action="/listings/createListing" method="post" id="createForm">
+    <form action="/listings/createListing" method="post" id="createForm" novalidate class = "needs-validation">
+
+        <!-- Title input -->
         <div class="mb-3">
             <b><label for="titleInput" class="form-label">Title</label></b>
-            <input type="text" name="titleInput" id="titleInput" class="form-control" placeholder="Enter the title for your property">
+            <input type="text" name="titleInput" id="titleInput" class="form-control" placeholder="Enter the title for your property" required>
+            <div class="invalid-feedback">Please enter a title for your property.</div>
         </div>
+
+        <!-- Description input -->
         <div class="mb-3">
             <b><label for="descInput" class="form-label">Description </label></b>
             <textarea 
@@ -15,9 +20,20 @@
                 class="form-control"
                 cols="50" 
                 rows="2" 
-                placeholder="Write some things about your property..."></textarea>
+                placeholder="Write some things about your property..." 
+                required></textarea>
+            <div class="invalid-feedback">Please enter a description for your property.</div>
         </div>
+
+        <!-- Image input -->
+        <div class="mb-3">
+            <b><label for="imageInput" class="form-label">Image URL</label></b>
+            <input type="text" name="imageInput" id="imageInput"  class="form-control" placeholder="Enter the URL of an image of your property">
+        </div>
+
+        <!-- Divided row -->
         <div class="row mb-3">
+            <!-- Price input -->
             <div class="col-md-4">
                 <b><label for="priceInput" class="form-label">Enter a per night price for your property (INR) </label></b>
                 <input 
@@ -26,22 +42,30 @@
                     class="form-control"
                     name="priceInput" 
                     min="0" step="0.01" 
-                    placeholder="0.00">
+                    placeholder="0.00"
+                    required>
+                <div class="invalid-feedback">Please enter a price for your property.</div>
             </div>
+            <!-- Country input -->
             <div class="col-md-8">
                 <b><label for="countryInput" class="form-label">Country</label></b>
-                <select name="countryInput" id="countryInput"  class="form-control">
+                <select name="countryInput" id="countryInput"  class="form-control" required>
                     <option value="">Select a country...</option>
                     <% countries.forEach(function(name) { %>
                         <option value="<%= name %>"><%= name %></option>
                     <% }); %>
                 </select>
+                <div class="invalid-feedback">Please select a country for your property.</div>
             </div>
         </div>
+        <!-- Location input -->
         <div class="mb-3">
             <b><label for="locationInput" class="form-label">Location</label></b>
-            <input type="text" name="locationInput" id="locationInput"  class="form-control" placeholder="Enter the rough location of the property">
+            <input type="text" name="locationInput" id="locationInput"  class="form-control" placeholder="Enter the rough location of the property" required>
+            <div class="invalid-feedback">Please enter a location for your property.</div>
         </div>
+
+
         <br>
         <button type="submit" class="btn btn-outline-dark">Create the listing</button>
     </form>

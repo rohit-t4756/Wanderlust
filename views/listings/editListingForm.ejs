@@ -3,6 +3,8 @@
     <br><br>
     <h3>Edit the listing for your property</h3>
     <form action="/listings/<%= params.id %>/edit" id="editForm">
+
+        <!-- Title input -->
         <div class="mb-3">
             <b><label for="titleInput" class="form-label">Edit title</label></b>
             <input 
@@ -11,7 +13,10 @@
                 id="titleInput" 
                 class="form-control"
                 value="<%= listing.title %>">
+            <div class="invalid-feedback">Please enter a title for your property.</div>
         </div>
+
+        <!-- Description input -->
         <div class="mb-3">
             <b><label for="descInput" class="form-label">Edit description </label></b>
             <textarea 
@@ -21,8 +26,19 @@
                 cols="40" 
                 rows="2"
             ><%=listing.description%></textarea>
+            <div class="invalid-feedback">Please enter a description for your property.</div>
         </div>
+
+        <!-- Image input -->
+        <div class="mb-3">
+            <b><label for="imageInput" class="form-label">Image URL</label></b>
+            <input type="text" name="imageInput" id="imageInput"  class="form-control" value="<%= listing.image.url %>">
+        </div>
+
+        <!-- Divided row -->
         <div class="row mb-3">
+            
+            <!-- Price input -->
             <div class="col-md-4">
                 <b><label for="priceInput" class="form-label">Edit the per night price (INR)</label></b>
                 <input 
@@ -32,7 +48,10 @@
                     name="priceInput" 
                     min="0" step="0.01" 
                     placeholder="<%= listing.price %>">
+                <div class="invalid-feedback">Please enter a price for your property.</div>
             </div>
+            
+            <!-- Country input -->
             <div class="col-md-8">
                 <b><label for="countryInput" class="form-label">Edit the country</label></b>
                 <select name="countryInput" id="countryInput"  class="form-control" >
@@ -44,8 +63,11 @@
                         <option value="<%= name %>"><%= name %></option>
                     <% } %>
                 </select>
+                <div class="invalid-feedback">Please select a country for your property.</div>
             </div>
         </div>
+
+        <!-- Location input -->
         <div class="mb-3">
             <b><label for="locationInput" class="form-label">Edit the location</label></b>
             <input 
@@ -55,6 +77,7 @@
                 class="form-control"
                 value="<%= listing.location %>"
             >
+            <div class="invalid-feedback">Please enter a location for your property.</div>
         </div>
         
         <button type="submit" class="btn btn-outline-dark">Edit the listing</button>
@@ -71,6 +94,10 @@
             let content = {
                 title: formData.get('titleInput'),
                 description: formData.get('descInput'),
+                image: {
+                    filename: 'userAddedThis',
+                    url: formData.get('imageInput')
+                },
                 price: formData.get('priceInput'),
                 location: formData.get('locationInput'),
                 country: formData.get('countryInput')

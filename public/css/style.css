@@ -134,3 +134,47 @@ footer {
     border-color: #fe424d;
     background-color: #fe424d;
 }
+
+/* Show listing page */
+.showListingImg {
+    height: 40vh; 
+    width: 100%;
+    border-radius: 1.5rem;
+    object-fit: cover;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.showListingImg:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.showPriceCard {
+    border: 1px solid #ced4da; /* Slightly thinner border looks more modern */
+    width: 90%; /* Reduced width as requested */
+    height: 80%; /* Allow height to adjust to text */
+    padding: 0.4rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.showBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.priceDabba {
+    height: fit-content;
+    width: fit-content;
+
+    padding: 0.5rem;
+}
+
+.location-text {
+    margin-top: 0.1rem;
+    padding-left: 0.4rem;
+}

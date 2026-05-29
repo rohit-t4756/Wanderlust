@@ -36,12 +36,18 @@ async function main() {
 
 // Initialise the DB manually.
 
+
+
+
+
 // Implement additional routing.
 // Index Route: Show all the listings.
 app.get("/listings", async (request, response) => {
     const listingData = await Listing.find({});
     response.render("listings/allListings.ejs", {listingData});
 })
+
+
 
 // New Listing Route: Present a form to create a new listing.
 const { countries } = require('countries-list');
@@ -51,6 +57,8 @@ app.get("/listings/new", (request, response) => {
     response.render("listings/listingCreation.ejs", {countries: country_list});
 })
 
+
+
 // Create Route: Create a new listing and add it to the DB.
 app.post("/listings/createListing", async(request, response) => {
     console.log(request.body);
@@ -58,6 +66,10 @@ app.post("/listings/createListing", async(request, response) => {
     const listing = new Listing({
         title: formData.titleInput,
         description: formData.descInput,
+        image: {
+            filename: 'userAddedThis',
+            url: formData.imageInput
+        },
         price: formData.priceInput,
         location: formData.locationInput,
         country: formData.countryInput,
@@ -67,11 +79,14 @@ app.post("/listings/createListing", async(request, response) => {
 })
 
 
+
 // Show Route: Show information for one listing.
 app.get("/listings/:id", async (request, response) => {
     const listingData = await Listing.findById(request.params.id);
-    response.render("listings/showListingInformation.ejs", {listingData: listingData, params: request.params})
+    response.render("listings/showListingInformation.ejs", {listing: listingData, params: request.params})
 })
+
+
 
 // Edit Route: Send the edit form
 app.get("/listings/:id/edit", async(request, response) => {
@@ -83,13 +98,13 @@ app.get("/listings/:id/edit", async(request, response) => {
 })
 
 app.patch("/listings/:id/edit", async(request, response) => {
-    let {title, description, price, location, country} = request.body;
+    let {title, description, image, price, location, country} = request.body;
     let {id} = request.params;
 
     try {
         const updatedListing =  await Listing.findByIdAndUpdate(
             id,
-            {title, description, price, location, country},
+            {title, description, image, price, location, country},
             {returnDocument: 'after', runValidators: true}
         );
         if (!updatedListing) {
@@ -98,9 +113,11 @@ app.patch("/listings/:id/edit", async(request, response) => {
 
         response.status(200).json(updatedListing);
     } catch (error) {
-        res.status(400).json({ error: err.message });
+        response.status(400).json({ error: error.message });
     }
 });
+
+
 
 // Delete Route: Send a confirmation alert
 app.delete("/listings/:id", async (request, response) => {
