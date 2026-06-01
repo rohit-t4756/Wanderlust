@@ -1,0 +1,12 @@
+<% layout("/layouts/boilerplate") -%>
+<body>
+    <div class="col-8 alert alert-danger" role="alert" style="margin: 1rem auto; text-align: center;">
+        <b>Something went wrong!</b>
+        <br>
+        Status Code: <%= statusCode %>. &nbsp;&nbsp;&nbsp;<%= message %>
+        <br>
+        <%= error.message %>
+        <br><br>
+        <a href="/listings" class="alert-link">Go back to the homepage</a>
+    </div>
+</body>
