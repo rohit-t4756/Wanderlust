@@ -30,12 +30,77 @@
             <form action="/listings/<%= listing._id %>" id="deleteForm">
                 <button type="submit" class="btn btn-outline-dark">Delete this listing</button>
             </form>
+            <br>
+            <button 
+                class="btn btn-outline-dark mb-3" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#reviewForm" 
+                aria-expanded="true" 
+                aria-controls="reviewForm"
+            >
+                Write a review
+            </button>
 
+            <div class="collapse show accordion mb-4" id="reviewForm">
+                <div class="card card-body">
+                    <h4 style="margin-top: 2px; margin-left: 4px; padding: 4px"> Write a review for this listing</h4>
+                    <hr style="margin: 0; padding: 0;">
+                    <form action="/listings/<%= listing._id %>/reviews" method="POST">
+                        <div id="ratingSection" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; margin-left: 6px;">
+                            <label for="ratingInput">Rating</label>
+                            <input 
+                                type="range"
+                                name="review[rating]" 
+                                id="ratingInput" 
+                                min=1 max=5
+                                style="width: 100%; max-width: 200px;"
+                            >
+                        </div>
+                        <div id="commentSection" style="display: flex; align-items:flex-start; gap: 5px; margin-left: 6px;">
+                            <label for="commentInput" style="white-space: nowrap; flex-shrink: 0;">
+                                Enter your comments (Please keep it civil):&nbsp;
+                            </label>
+                            <textarea 
+                                name="review[comment]"
+                                id="commentInput" 
+                                cols="20" rows="4"
+                                placeholder="How was your stay? Tell future guests about the space, location, and host."
+                                class="form-control"
+                                style="flex-grow: 1; box-sizing: border-box;"
+                            ></textarea>
+                        </div>
+                        <button class="btn btn-outline-dark mb-3 mt-3" type="submit">Create review</button>
+                    </form>
+                </div>
+            </div>
         </div> 
     </div>
 
     
     
+    <!-- Accordion scroll into view -->
+    <script>
+        // 1. Find all accordion content areas on your page
+        const accordions = document.querySelectorAll('.accordion .collapse');
+
+        // 2. Loop through each accordion item
+        accordions.forEach(accordion => {
+            // 3. Listen for Bootstrap's "fully opened" event
+            accordion.addEventListener('shown.bs.collapse', function () {
+                // 4. Find the button/header that controls this specific accordion
+                const header = this.previousElementSibling;
+                
+                // 5. Smoothly scroll that header into view
+                header.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            });
+        });
+    </script>
+
+    <!-- Delete Button -->
     <script>
         const deleteForm = document.getElementById("deleteForm");
 
@@ -45,23 +110,27 @@
             const listingId = "<%= params.id %>";
             try {
                 const response = await fetch(`/listings/${listingId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
 
-            if (response.ok) {
-                // Redirect or show success message
-                const result = await response.json();
-                console.log("Update successful:", result);
-                window.location.href = '/listings'; 
-            } else {
-                alert("Failed to update listing.");
+                if (response.ok) {
+                    // Redirect or show success message
+                    const result = await response.json();
+                    console.log("Update successful:", result);
+                    window.location.href = '/listings'; 
+                } 
+                else {
+                    alert("Failed to update listing.");
+                }
+            } 
+            catch (error) {
+                console.error("Error sending PATCH request:", error);
+                throw new expressError(500, "Something went wrong while sending the PATCH request.");
             }
-        } catch (error) {
-            console.error("Error sending PATCH request:", error);
-        }
-    });
+        });
     </script>
+
 </body>

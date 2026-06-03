@@ -4,7 +4,9 @@ const Listing = require("./models/listingSchema");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utilities/wrapAsync.js")
 const expressError = require('./utilities/expressError.js');
-const listingSchema_joi = require("./joi_schema/listing_schema.js");
+const listingSchema_joi = require("./joi_schema/listing_schema_joi.js");
+const Review = require("./models/reviewSchema.js")
+const reviewSchema_joi = require("./joi_schema/review_schema_joi.js");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -48,8 +50,19 @@ function validateListingSchema(request, response, next) {
 
     // Invalid schema route.
     if (error) {
-        response.render("errors/error.ejs", {error, statusCode: 400, message: "Bad Request"});
+        response.render("errors/error.ejs", {error, statusCode: 400, message: "JOI_ERROR\nBad Request: Incorrect Schema for Listing"});
         return;
+    }
+    // Valid Schema route.
+    next();
+}
+
+function validateReviewSchema(request, response, next) {
+    const {error} = reviewSchema_joi.validate({review: request.body});
+
+    // Invalid schmea route.
+    if (error) {
+        response.render("/errors/error.ejs", {error, statusCode: 400, message: "JOI_ERROR\nBad Request: Incorrect Schema for Review"})
     }
     // Valid Schema route.
     next();
@@ -162,10 +175,36 @@ app.delete(
 
 
 
+// Reviews
+// Post Route
+app.post(
+    "/listings/:id/reviews",
+    validateReviewSchema,
+    wrapAsync(async (request, response) => {
+        console.log(request.body);
+        let {review} = request.body;
+        let listingId = request.params.id;
+        const newReview = new Review({
+            comment: review.comment,
+            rating: review.rating,
+        })
+
+        let listing = await Listing.findById(listingId);
+        listing.reviews.push(newReview);
+
+        await newReview.save();
+        await listing.save();
+
+        response.redirect(`/listings/${listingId}`);
+    })
+)
+
+
+
 // Error handling middleware.
 app.use((error, request, response, next) => {
     console.log("Error handling middleware was called.");
     console.log("Error: ", error.message);
     // throw new expressError(500, "Something went wrong.");
-    response.render("errors/error.ejs", {error, statusCode: 500, message: "Internal Server Error"});
+    response.render("errors/error.ejs", {error, statusCode: error.statusCode || 500, message: error.message || "Internal Server Error"});
 });

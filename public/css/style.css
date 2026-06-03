@@ -152,9 +152,9 @@ footer {
 }
 
 .showPriceCard {
-    border: 1px solid #ced4da; /* Slightly thinner border looks more modern */
-    width: 90%; /* Reduced width as requested */
-    height: 80%; /* Allow height to adjust to text */
+    border: 1px solid #ced4da; 
+    width: 90%;
+    height: 80%;
     padding: 0.4rem;
     border-radius: 1rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -177,4 +177,22 @@ footer {
 .location-text {
     margin-top: 0.1rem;
     padding-left: 0.4rem;
+}
+
+/* Review Form */
+#reviewForm {
+    border: 1px solid #ced4da; 
+    width: 90%;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#reviewForm {
+    border: 1px solid #ced4da; /* Slightly thinner border looks more modern */
+    width: 90%; /* Reduced width as requested */
+    height: 80%; /* Allow height to adjust to text */
+    padding: 0.4rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
