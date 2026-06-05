@@ -42,38 +42,67 @@
                 Write a review
             </button>
 
-            <div class="collapse show accordion mb-4" id="reviewForm">
-                <div class="card card-body">
-                    <h4 style="margin-top: 2px; margin-left: 4px; padding: 4px"> Write a review for this listing</h4>
-                    <hr style="margin: 0; padding: 0;">
-                    <form action="/listings/<%= listing._id %>/reviews" method="POST">
-                        <div id="ratingSection" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; margin-left: 6px;">
-                            <label for="ratingInput">Rating</label>
-                            <input 
-                                type="range"
-                                name="review[rating]" 
-                                id="ratingInput" 
-                                min=1 max=5
-                                style="width: 100%; max-width: 200px;"
-                            >
-                        </div>
-                        <div id="commentSection" style="display: flex; align-items:flex-start; gap: 5px; margin-left: 6px;">
-                            <label for="commentInput" style="white-space: nowrap; flex-shrink: 0;">
-                                Enter your comments (Please keep it civil):&nbsp;
-                            </label>
-                            <textarea 
-                                name="review[comment]"
-                                id="commentInput" 
-                                cols="20" rows="4"
-                                placeholder="How was your stay? Tell future guests about the space, location, and host."
-                                class="form-control"
-                                style="flex-grow: 1; box-sizing: border-box;"
-                            ></textarea>
-                        </div>
-                        <button class="btn btn-outline-dark mb-3 mt-3" type="submit">Create review</button>
-                    </form>
+            <div class="collapse accordion mb-4" id="reviewForm">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 style="margin-top: 2px; margin-left: 4px; padding: 4px"> Write a review for this listing</h4>
+                        <hr style="margin: 0; padding: 0;">
+                        <form action="/listings/<%= listing._id %>/reviews" method="POST">
+                            <div id="ratingSection" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; margin-left: 6px;">
+                                <label for="ratingInput">Rating</label>
+                                <input 
+                                    type="range"
+                                    name="review[rating]" 
+                                    id="ratingInput" 
+                                    min=1 max=5
+                                    style="width: 100%; max-width: 200px;"
+                                >
+                            </div>
+                            <div id="commentSection" style="display: flex; align-items:flex-start; gap: 5px; margin-left: 6px;">
+                                <label for="commentInput" style="white-space: nowrap; flex-shrink: 0;">
+                                    Enter your comments (Please keep it civil):&nbsp;
+                                </label>
+                                <textarea 
+                                    name="review[comment]"
+                                    id="commentInput" 
+                                    cols="20" rows="4"
+                                    placeholder="How was your stay? Tell future guests about the space, location, and host."
+                                    class="form-control"
+                                    style="flex-grow: 1; box-sizing: border-box;"
+                                ></textarea>
+                            </div>
+                            <button class="btn btn-outline-dark mb-3 mt-3" type="submit">Create review</button>
+                        </form>
+                    </div>
                 </div>
             </div>
+
+            <!-- All reviews -->
+            <% if (listing.reviews && listing.reviews.length > 0) { %>
+                <h4>All reviews</h4>
+                <div class="row g-1 mt-1 mb-4"> 
+                    <% for (let review of listing.reviews) { %>
+                        <div class="col-md-6"> 
+                            <div class="review-card card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><%= (review.username || "Jane Doe") %></h5>
+                                    <div class="card-text">
+                                        <%= "⭐".repeat(review.rating) %>
+                                        <% if (!review.comment || review.comment.trim() === "") { %>
+                                            <p class="text-muted">No comment.</p>
+                                        <% } else { %>
+                                            <p><%= review.comment %></p>
+                                        <% } %>
+                                    </div>
+                                    <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>" class="reviewDeleteForm" data-review-id="<%= review._id %>">
+                                        <button class="btn btn-outline-dark" type="submit">Delete this review</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
         </div> 
     </div>
 
@@ -100,7 +129,7 @@
         });
     </script>
 
-    <!-- Delete Button -->
+    <!-- Listing Delete Button -->
     <script>
         const deleteForm = document.getElementById("deleteForm");
 
@@ -117,7 +146,6 @@
                 });
 
                 if (response.ok) {
-                    // Redirect or show success message
                     const result = await response.json();
                     console.log("Update successful:", result);
                     window.location.href = '/listings'; 
@@ -127,10 +155,38 @@
                 }
             } 
             catch (error) {
-                console.error("Error sending PATCH request:", error);
-                throw new expressError(500, "Something went wrong while sending the PATCH request.");
+                console.error("Error sending listing DELETE request:", error);
+                throw new expressError(500, "Something went wrong while sending the listing DELETE request.");
             }
         });
     </script>
 
+    <!-- Review Delete Button -->
+    <script>
+        // Attach listener to all review delete forms and read review id from data attribute
+        const reviewDeleteForms = document.querySelectorAll('.reviewDeleteForm');
+        reviewDeleteForms.forEach(form => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const listingId = "<%= params.id %>";
+                const reviewId = form.dataset.reviewId;
+                try {
+                    const response = await fetch(`/listings/${listingId}/reviews/${reviewId}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Update successful:', result);
+                        window.location.href = `/listings/${listingId}`;
+                    } else {
+                        alert('Failed to delete review.');
+                    }
+                } catch (error) {
+                    console.error('Error sending review DELETE request:', error);
+                    throw new expressError(500, "Something went wrong while sending the review DELETE request.");
+                }
+            });
+        });
+    </script>
 </body>

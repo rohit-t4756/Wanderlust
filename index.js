@@ -45,28 +45,49 @@ async function main() {
 
 // =========================================================================================================
 function validateListingSchema(request, response, next) {
+    console.log("Request body: ", request.body);
     // Validating the schema before creating the listing for db push.
     const {error} = listingSchema_joi.validate({listing: request.body});
 
     // Invalid schema route.
     if (error) {
-        response.render("errors/error.ejs", {error, statusCode: 400, message: "JOI_ERROR\nBad Request: Incorrect Schema for Listing"});
-        return;
+        return next(new expressError(400, "JOI_ERROR\nBad Request: Incorrect Schema for Listing"));
     }
     // Valid Schema route.
     next();
 }
 
 function validateReviewSchema(request, response, next) {
-    const {error} = reviewSchema_joi.validate({review: request.body});
+    console.log("Request body: ", request.body);
+    const {error} = reviewSchema_joi.validate(request.body);
 
     // Invalid schmea route.
     if (error) {
-        response.render("/errors/error.ejs", {error, statusCode: 400, message: "JOI_ERROR\nBad Request: Incorrect Schema for Review"})
+        return next(new expressError(400, "JOI_ERROR\nBad Request: Incorrect Schema for Review"));
     }
     // Valid Schema route.
     next();
 }
+
+const deleteReviewsUponListingDeletion = wrapAsync(async (request, response, next) => {
+    const { id } = request.params;
+    
+    const listing = await Listing.findById(id);
+    if (!listing) {
+        return next(new expressError(404, "Listing not found. Cannot process review deletion."));
+    }
+
+    try {
+        if (listing.reviews && listing.reviews.length > 0) {
+            await Review.deleteMany({ _id: { $in: listing.reviews } });
+        }
+        
+        next();
+    } catch (dbError) {
+        next(new expressError(500, `Database error: Failed to delete associated reviews. Details: ${dbError.message}`));
+    }
+});
+
 // =========================================================================================================
 
 // Implement additional routing.
@@ -97,7 +118,6 @@ app.post(
     "/listings/createListing", 
     validateListingSchema,
     wrapAsync(async(request, response) => {
-    console.log("Request body: ", request.body);
     const formData = request.body
     
     const listing = new Listing({
@@ -121,7 +141,7 @@ app.post(
 app.get(
     "/listings/:id", 
     wrapAsync(async (request, response) => {
-    const listingData = await Listing.findById(request.params.id);
+    const listingData = await Listing.findById(request.params.id).populate("reviews");
     response.render("listings/showListingInformation.ejs", {listing: listingData, params: request.params})
 }));
 
@@ -163,6 +183,7 @@ app.patch(
 // Delete Route: Send a confirmation alert
 app.delete(
     "/listings/:id",
+    deleteReviewsUponListingDeletion,
     wrapAsync(async (request, response) => {
         const {id} = request.params;
         const deletedListing = await Listing.findByIdAndDelete(id);
@@ -180,8 +201,7 @@ app.delete(
 app.post(
     "/listings/:id/reviews",
     validateReviewSchema,
-    wrapAsync(async (request, response) => {
-        console.log(request.body);
+    wrapAsync(async (request, response) => { 
         let {review} = request.body;
         let listingId = request.params.id;
         const newReview = new Review({
@@ -196,6 +216,20 @@ app.post(
         await listing.save();
 
         response.redirect(`/listings/${listingId}`);
+    })
+)
+
+// Delete Route
+app.delete(
+    "/listings/:listingId/reviews/:reviewId",
+    wrapAsync(async (request, response) => {
+        const listingId = request.params.listingId;
+        const reviewId = request.params.reviewId;
+
+        const deletedReview = await Review.findByIdAndDelete(reviewId);
+        await Listing.findByIdAndUpdate(listingId, { $pull : {reviews : reviewId}});
+
+        response.status(200).json({ success: true, message: "Review deleted" });
     })
 )
 
