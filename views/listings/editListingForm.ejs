@@ -89,41 +89,38 @@
         editForm.addEventListener("submit", async (event) => {
             event.preventDefault();
 
-            const formData = new FormData(editForm);
-
             let content = {
-                title: formData.get('titleInput'),
-                description: formData.get('descInput'),
-                image: {
-                    filename: 'userAddedThis',
-                    url: formData.get('imageInput')
-                },
-                price: formData.get('priceInput'),
-                location: formData.get('locationInput'),
-                country: formData.get('countryInput')
-            }
+                titleInput: document.getElementById('titleInput').value,
+                descInput: document.getElementById('descInput').value,
+                imageInput: document.getElementById('imageInput').value,
+                priceInput: document.getElementById('priceInput').value,
+                locationInput: document.getElementById('locationInput').value,
+                countryInput: document.getElementById('countryInput').value
+            };
 
-            const listingId = "<%= params.id %>";
+            const listingId = "<%= listing._id %>";
             try {
                 const response = await fetch(`/listings/${listingId}/edit`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(content)
-            });
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(content)
+                });
 
-            if (response.ok) {
-                // Redirect or show success message
-                const result = await response.json();
-                console.log("Update successful:", result);
-                window.location.href = '/listings/<%= params.id %>'; 
-            } else {
-                alert("Failed to update listing.");
+                if (response.ok) {
+                    // Redirect or show success message
+                    const result = await response.json();
+                    console.log("Update successful:", result);
+                    window.location.href = '/listings/<%= listing._id %>'; 
+                } 
+                else {
+                    alert("Failed to update listing.");
+                }
+            } 
+            catch (error) {
+                console.error("Error sending PATCH request:", error);
             }
-        } catch (error) {
-            console.error("Error sending PATCH request:", error);
-        }
-    });
+        });
     </script>
 </body>

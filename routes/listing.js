@@ -23,9 +23,9 @@ function validateListingSchema(request, response, next) {
     next();
 }
 const deleteReviewsUponListingDeletion = wrapAsync(async (request, response, next) => {
-    const { id } = request.params;
+    const { listingId } = request.params;
     
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(listingId);
     if (!listing) {
         return next(new expressError(404, "Listing not found. Cannot process review deletion."));
     }
@@ -102,7 +102,7 @@ router.get(
 router.get(
     "/:listingId/edit", 
     wrapAsync(async(request, response) => {
-    const listingData = await Listing.findById(request.params.id);
+    const listingData = await Listing.findById(request.params.listingId);
 
     const country_list = Object.values(countries).map(c => c.name).sort();
     response.render("listings/editListingForm.ejs", {params: request.params, listing: listingData, countries: country_list});
@@ -113,17 +113,30 @@ router.patch(
     "/:listingId/edit", 
     validateListingSchema,
     wrapAsync(async(request, response) => {
-    let {title, description, image, price, location, country} = request.body;
-    let {id} = request.params;
+    let {titleInput, descInput, imageInput, priceInput, locationInput, countryInput} = request.body;
+    const {listingId} = request.params;
+    let image = {
+        filename: "user added this",
+        url: imageInput
+    }
+    let toBeSent = {
+        title: titleInput,
+        description: descInput,
+        image: image,
+        price: priceInput,
+        location: locationInput,
+        country: countryInput
+    }
+    
 
     const updatedListing =  await Listing.findByIdAndUpdate(
-        id,
-        {title, description, image, price, location, country},
+        listingId,
+        toBeSent,
         {returnDocument: 'after', runValidators: true}
     );
     if (!updatedListing) {
-        // return response.status(404).json({message: "Listing Not Found in Database."});
-        response.render("errors/error.ejs", {error: new expressError(404, "Listing Not Found in Database."), statusCode: 404, message: "Not Found"});
+        return response.status(404).json({message: "Listing Not Found in Database."});
+        // response.render("errors/error.ejs", {error: new expressError(404, "Listing Not Found in Database."), statusCode: 404, message: "Not Found"});
     }
 
     response.status(200).json(updatedListing);
@@ -136,8 +149,8 @@ router.delete(
     "/:listingId",
     deleteReviewsUponListingDeletion,
     wrapAsync(async (request, response) => {
-        const {id} = request.params;
-        const deletedListing = await Listing.findByIdAndDelete(id);
+        const {listingId} = request.params;
+        const deletedListing = await Listing.findByIdAndDelete(listingId);
 
         if (!deletedListing)
             return response.status(404).json({ message: "Listing not found." });

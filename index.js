@@ -20,7 +20,7 @@ app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
 // Get the server up and running.
-const port = 3000;
+const port = 8080;
 app.listen(port, () => {
     console.log(`The server is listening to port ${port}.`);
 });

@@ -27,7 +27,7 @@
             <form action="/listings/<%=listing._id%>/edit" method="get" class="mb-2">
                 <button type="submit" class="btn btn-outline-dark">Edit this listing</button>
             </form>
-            <form action="/listings/<%= listing._id %>" id="deleteForm">
+            <form action="/listings/<%= listing._id %>" method="post" id="deleteForm">
                 <button type="submit" class="btn btn-outline-dark">Delete this listing</button>
             </form>
             <br>
@@ -115,17 +115,12 @@
     
     <!-- Accordion scroll into view -->
     <script>
-        // 1. Find all accordion content areas on your page
         const accordions = document.querySelectorAll('.accordion .collapse');
 
-        // 2. Loop through each accordion item
         accordions.forEach(accordion => {
-            // 3. Listen for Bootstrap's "fully opened" event
             accordion.addEventListener('shown.bs.collapse', function () {
-                // 4. Find the button/header that controls this specific accordion
                 const header = this.previousElementSibling;
                 
-                // 5. Smoothly scroll that header into view
                 header.scrollIntoView({ 
                     behavior: 'smooth', 
                     block: 'start' 
@@ -141,13 +136,13 @@
         deleteForm.addEventListener("submit", async (event) => {
             event.preventDefault();
 
-            const listingId = "<%= params.id %>";
+            const listingId = "<%= listing._id %>";
             try {
-                const response = await fetch(`/listings/${listingId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                const response = await fetch(
+                    `/listings/${listingId}`, 
+                    {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
                 });
 
                 if (response.ok) {
@@ -174,7 +169,6 @@
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 
-                // 1. Read listing ID directly from the EJS listing object
                 const listingId = "<%= listing._id %>";
                 const reviewId = form.dataset.reviewId;
                 
@@ -190,13 +184,11 @@
                     if (response.ok) {
                         const result = await response.json();
                         console.log('Update successful:', result);
-                        // Redirect to the listing page on successful deletion
                         window.location.href = `/listings/${listingId}`;
                     } else {
                         alert('Failed to delete review.');
                     }
                 } catch (error) {
-                    // 2. Fixed: Use standard client-side alert/console error logging
                     console.error('Error sending review DELETE request:', error);
                     alert("Something went wrong while sending the review DELETE request.");
                 }
