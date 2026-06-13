@@ -4,8 +4,13 @@ const ejsMate = require("ejs-mate");
 const session = require("express-session");
 const flash = require("connect-flash");
 
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/userSchema.js");
+
 const listingsRouter = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
+const usersRouter = require("./routes/user.js");
 
 const app = express();
 
@@ -16,12 +21,7 @@ app.set("views", path.join(__dirname, "/views"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
-// Get the server up and running.
-const port = 8080;
-app.listen(port, () => {
-	console.log(`The server is listening to port ${port}.`);
-});
-
+// Session setup
 const sessionOptions = {
 	secret: "mysupersecretstring",
 	resave: false,
@@ -37,12 +37,23 @@ app.use(session(sessionOptions));
 app.use(flash());
 
 
+// Passport setup
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
 
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-// Basic Rounting
-app.get("/", (req, res) => {
-	res.send("You are connected to root.");
+// Flash setup
+app.use((request, response, next) => {
+	response.locals.success = request.flash("success") || []; // Uses empty array if empty
+	response.locals.error = request.flash("error") || [];
+	response.locals.userData = request.user;
+	response.locals.requestHBbuaa = request;
+	next();
 });
+
 
 // Connect to the database.
 const mongoose = require("mongoose");
@@ -60,11 +71,31 @@ async function main() {
 
 // Initialise the DB manually.
 
+// Basic Rounting
+app.get("/", (req, res) => {
+	res.send("You are connected to root.");
+});
+
 // /listings router
 app.use("/listings", listingsRouter);
 
 // Reviews
 app.use("/listings/:listingId/reviews", reviewsRouter);
+
+// User
+app.use("/user", usersRouter);
+
+// /logout
+app.post(
+	'/logout', 
+	(request, response, next) => {
+		request.logout((error) => {
+			if (error) { return next(error); }
+			request.flash("success", "You were sucessfully logged out");
+			response.redirect('/listings');
+		});
+	}
+);
 
 // Error handling middleware.
 app.use((error, request, response, next) => {
@@ -76,4 +107,11 @@ app.use((error, request, response, next) => {
 		statusCode: error.statusCode || 500,
 		message: error.message || "Internal Server Error",
 	});
+});
+
+
+// Get the server up and running.
+const port = 8080;
+app.listen(port, () => {
+	console.log(`The server is listening to port ${port}.`);
 });

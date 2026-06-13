@@ -1,0 +1,247 @@
+<% layout("/layouts/boilerplate") -%>
+<style>
+    /* Centers the card and gives it a nice feel */
+    .signup-card {
+        max-width: 500px;
+        margin: 2rem auto;
+        border: 1px solid #dddddd;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 6px 16px;
+    }
+    /* Hides steps that are not active */
+    .form-step {
+        display: none;
+    }
+    .form-step-active {
+        display: block;
+    }
+    /* Stack inputs vertically inside the input group */
+    .joint-name-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .joint-input-top {
+        border-top-left-radius: 8px !important;
+        border-top-right-radius: 8px !important;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+    .joint-input-bottom {
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-left-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+        margin-top: -1px; /* Overlaps borders perfectly */
+    }
+    /* Prevents double borders when inputs are valid/invalid */
+    .joint-name-group .form-control:focus,
+    .joint-name-group .form-control.is-invalid,
+    .joint-name-group .form-control.is-valid {
+        z-index: 3;
+    }
+
+    /* just the h5 */
+    h5 {
+        font-size:large;
+    }
+</style>
+
+<body>
+    <div class="signup-card">
+        <h3>Welcome to Wanderlust</h3>
+        <hr>
+        <form action="/user/signup" method="post" novalidate class="needs-validation">
+                <!-- The email part -->
+            <div class="form-step form-step-active" id="step-1">
+                <h5 class="mb-3">Let's go!</h5>
+                <div class="mb-3">
+                    <label 
+                        for="emailInput"
+                        class="form-label fw-bold"
+                    >Email</label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="emailInput"
+                        class="form-control"
+                        placeholder="abc@xmail.com"
+                        required
+                        autocomplete="email"
+                    >
+                    <div class="invalid-feedback">Please enter an email</div>
+                </div>
+                <button type="button" class="btn btn-outline-dark" id="btn-to-step-2">Continue</button>
+            </div>
+
+            <!-- Fake OTP thing -->
+            <div class="form-step" id="step-2">
+                <h5 class="mb-3">Verify email</h5>
+                <div class="mb-3">
+                    <label 
+                        for="otpInput" 
+                        class="form-label fw-bold"
+                    >Enter OTP</label>
+                    <input 
+                        type="text" 
+                        id="otpInput" 
+                        class="form-control text-center mx-auto mx-md-0" 
+                        placeholder="1234" 
+                        maxlength="4"
+                    >
+                    <div class="invalid-feedback" id="otp-error">Incorrect OTP. Try "1234"!</div>
+                </div>
+                <button type="button" class="btn btn-outline-dark" id="btn-to-step-3">Continue</button>
+                <button type="button" class="btn btn-outline-dark small" id="btn-back-to-1">Back</button>
+            </div>
+
+            <!-- Other details portion -->
+            <div class="form-step" id="step-3">
+                <h5 class="mb-3">Enter details</h5>
+                <!-- Joint Name Dabba -->
+                <div class="mb-3">
+                    <label 
+                        class="form-label fw-bold"
+                    >Name</label>
+                    <div class="input-group joint-name-group">
+                        <input 
+                            type="text" 
+                            name="firstName" 
+                            id="firstNameInput" 
+                            class="form-control joint-input-top w-100" 
+                            placeholder="First name" 
+                            required
+                        >
+                        <input 
+                            type="text" 
+                            name="lastName" 
+                            id="lastNameInput" 
+                            class="form-control joint-input-bottom w-100" 
+                            placeholder="Last name (optional)"
+                        >
+                        <div class="invalid-feedback">Please enter at least the first name</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label 
+                        for="dobInput" 
+                        class="form-label fw-bold"
+                    >Date of Birth</label>
+                    <input 
+                        type="date" 
+                        name="dob" 
+                        id="dobInput" 
+                        class="form-control" 
+                        required
+                    >
+                    <div class="invalid-feedback">You must be at least 18 years old to join.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label 
+                        for="passwordInput"
+                        class="form-label fw-bold"
+                    >Password</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="passwordInput"
+                        class="form-control"
+                        required
+                    >
+                    <div class="invalid-feedback">Please enter a Password</div>
+                </div>
+                <div class="mb-3 ">
+                    <label 
+                        for="confirmPasswordInput"
+                        class="form-label fw-bold"
+                    >Confirm password</label>
+                    <input 
+                        type="password" 
+                        name="confirm_password" 
+                        id="confirmPasswordInput"
+                        class="form-control"
+                        required
+                    >
+                    <div class="invalid-feedback">Please enter matching password</div>
+                    <div class="valid-feedback">The passwords match!</div>
+                </div>
+
+                <button type="submit" class="btn btn-outline-dark" id="submitButton">Submit</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+<!-- Prevent Form submit if anything has bootstrap class "is-invalid" -->
+<script>
+    form.addEventListener("submit", (event) => {
+        if (form.querySelector('.is-invalid')) {
+        event.preventDefault();
+        }
+    }); 
+</script>
+
+<!-- Checks for every character input; if password.value and confirmPassword.value match -->
+<script>
+    const password = document.getElementById("passwordInput");
+    const confirmPassword = document.getElementById("confirmPasswordInput");
+    
+    confirmPassword.addEventListener("input", () => {
+        if (password.value != confirmPassword.value) {
+            confirmPassword.classList.add("is-invalid");
+        }
+        else {
+            confirmPassword.classList.remove("is-invalid");
+        }
+    })
+</script>
+
+<!-- Grays out/ blocks all the dates that would be under 18 -->
+<script>
+    const today = new Date();
+    const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    const maxDateString = eighteenYearsAgo.toISOString().split('T')[0];
+    document.getElementById('dobInput').setAttribute('max', maxDateString);
+</script>
+
+<!-- Handles show and hide of different form sections -->
+<script>
+    const step1 = document.getElementById("step-1");
+    const step2 = document.getElementById("step-2");
+    const step3 = document.getElementById("step-3");
+
+    const emailInput = document.getElementById("emailInput");
+    const otpInput = document.getElementById("otpInput");
+    const otpError = document.getElementById("otp-error");
+
+    document.getElementById("btn-to-step-2").addEventListener("click", () => {
+        if (emailInput.checkValidity()) {
+            step1.classList.remove("form-step-active");
+            step2.classList.add("form-step-active");
+        }
+        else {
+            emailInput.classList.add("is-invalid");
+        }
+    });
+
+    emailInput.addEventListener("focus", () => {
+        emailInput.classList.remove("is-invalid");
+    });
+
+    document.getElementById("btn-to-step-3").addEventListener("click", () => {
+        if (otpInput.value === "1234") {
+            otpInput.classList.remove('is-invalid');
+            step2.classList.remove('form-step-active');
+            step3.classList.add('form-step-active');
+        } else {
+            otpInput.classList.add('is-invalid');
+        }
+    });
+
+    document.getElementById("btn-back-to-1").addEventListener("click", () => {
+        step2.classList.remove("form-step-active");
+        step1.classList.add("form-step-active");
+    })
+</script>

@@ -1,0 +1,50 @@
+<% layout("/layouts/boilerplate.ejs") -%>
+<style>
+    /* Centers the card and gives it an Airbnb-style feel */
+    .login-card {
+        max-width: 500px;
+        margin: 2rem auto;
+        border: 1px solid #dddddd;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 6px 16px;
+    }
+</style>
+
+<body>
+    <div class="login-card">
+        <h3>Welcome back to Wanderlust</h3>
+        <hr>
+        <form action="/user/login" method="post" novalidate class="needs-validation">
+            <div class="mb-3">
+                <label 
+                    for="emailInput"
+                    class="form-label fw-bold"
+                >Email</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    id="emailInput"
+                    class="form-control"
+                >
+                <div class="invalid-feedback">Please enter a valid email</div>
+            </div>
+            <div class="mb-3">
+                <label 
+                    for="passwordInput"
+                    class="form-label fw-bold"
+                >Password</label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="passwordInput"
+                    class="form-control"
+                    required
+                    minlength="1"
+                >
+                <div class="invalid-feedback">Please enter your password</div>
+            </div>
+            <button type="submit" class="btn btn-outline-dark">Login</button>
+        </form>
+    </div>
+</body>

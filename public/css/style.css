@@ -15,6 +15,30 @@ body {
     height: 6rem;
 }
 
+.user-buttons form button {
+    background-color: #fe424d;
+    outline-color: #fe424d;
+    border-color: #fe424d;
+    color: white;
+    font-weight: 600; 
+    
+    transition: all 0.2s ease-in-out; 
+}
+
+.user-buttons form button:hover {
+    background-color: #e61e4d;
+    border-color: #e61e4d;
+    color: white;
+    
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+    
+    transform: scale(1.02); 
+}
+
+.user-buttons form button:active {
+    transform: scale(0.98);
+}
+
 .fa-compass {
     font-size: 1.5em;
     color: #fe424d;

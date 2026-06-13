@@ -9,37 +9,40 @@ const Review = require("../models/reviewSchema.js")
 
 const listingSchema_joi = require("../joi_schema/listing_schema_joi.js");
 
+// middlewares import
+let {validateListingSchema, deleteReviewsUponListingDeletion, authenticatedCheck} = require("../middlewares.js");
+
 // =========================================================================================================
-function validateListingSchema(request, response, next) {
-    console.log("Request body: ", request.body);
-    // Validating the schema before creating the listing for db push.
-    const {error} = listingSchema_joi.validate({listing: request.body});
+// function validateListingSchema(request, response, next) {
+//     console.log("Request body: ", request.body);
+//     // Validating the schema before creating the listing for db push.
+//     const {error} = listingSchema_joi.validate({listing: request.body});
 
-    // Invalid schema route.
-    if (error) {
-        return next(new expressError(400, "JOI_ERROR\nBad Request: Incorrect Schema for Listing"));
-    }
-    // Valid Schema route.
-    next();
-}
-const deleteReviewsUponListingDeletion = wrapAsync(async (request, response, next) => {
-    const { listingId } = request.params;
+//     // Invalid schema route.
+//     if (error) {
+//         return next(new expressError(400, "JOI_ERROR\nBad Request: Incorrect Schema for Listing"));
+//     }
+//     // Valid Schema route.
+//     next();
+// }
+// const deleteReviewsUponListingDeletion = wrapAsync(async (request, response, next) => {
+//     const { listingId } = request.params;
     
-    const listing = await Listing.findById(listingId);
-    if (!listing) {
-        return next(new expressError(404, "Listing not found. Cannot process review deletion."));
-    }
+//     const listing = await Listing.findById(listingId);
+//     if (!listing) {
+//         return next(new expressError(404, "Listing not found. Cannot process review deletion."));
+//     }
 
-    try {
-        if (listing.reviews && listing.reviews.length > 0) {
-            await Review.deleteMany({ _id: { $in: listing.reviews } });
-        }
+//     try {
+//         if (listing.reviews && listing.reviews.length > 0) {
+//             await Review.deleteMany({ _id: { $in: listing.reviews } });
+//         }
         
-        next();
-    } catch (dbError) {
-        next(new expressError(500, `Database error: Failed to delete associated reviews. Details: ${dbError.message}`));
-    }
-});
+//         next();
+//     } catch (dbError) {
+//         next(new expressError(500, `Database error: Failed to delete associated reviews. Details: ${dbError.message}`));
+//     }
+// });
 // =========================================================================================================
 
 // Index Route: Show all the listings.
@@ -57,9 +60,17 @@ const { countries } = require('countries-list');
 const { request } = require("http");
 router.get(
     "/new", 
+    authenticatedCheck,
     (request, response) => {
-    const country_list = Object.values(countries).map(c => c.name).sort();
-    response.render("listings/listingCreation.ejs", {countries: country_list});
+        // if (request.isUnauthenticated()) {
+        //     request.session.redirectUrl = request.originalUrl;
+        //     request.flash("error", "You must be logged in to create a listing!");
+        //     response.redirect("/user/login");
+        //     return;
+        // }
+
+        const country_list = Object.values(countries).map(c => c.name).sort();
+        response.render("listings/listingCreation.ejs", {countries: country_list});
 })
 
 
@@ -68,7 +79,15 @@ router.get(
 router.post(
     "/createListing", 
     validateListingSchema,
+    authenticatedCheck,
     wrapAsync(async(request, response) => {
+        // if (request.isUnauthenticated()) {
+        //     request.session.redirectUrl = request.originalUrl;
+        //     request.flash("error", "You must be logged in to create a listing!");
+        //     response.redirect("/user/login");
+        //     return;
+        // }
+
     const formData = request.body
     
     const listing = new Listing({
@@ -101,7 +120,14 @@ router.get(
 // Edit Route: Send the edit form
 router.get(
     "/:listingId/edit", 
+    authenticatedCheck,
     wrapAsync(async(request, response) => {
+        // if (request.isUnauthenticated()) {
+        //     request.session.redirectUrl = request.originalUrl;
+        //     request.flash("error", "You must be logged in to edit a listing!");
+        //     response.redirect("/user/login");
+        //     return;
+        // }
     const listingData = await Listing.findById(request.params.listingId);
 
     const country_list = Object.values(countries).map(c => c.name).sort();
@@ -111,44 +137,59 @@ router.get(
 
 router.patch(
     "/:listingId/edit", 
+    authenticatedCheck,
     validateListingSchema,
     wrapAsync(async(request, response) => {
-    let {titleInput, descInput, imageInput, priceInput, locationInput, countryInput} = request.body;
-    const {listingId} = request.params;
-    let image = {
-        filename: "user added this",
-        url: imageInput
-    }
-    let toBeSent = {
-        title: titleInput,
-        description: descInput,
-        image: image,
-        price: priceInput,
-        location: locationInput,
-        country: countryInput
-    }
-    
+        // if (request.isUnauthenticated()) {
+        //     request.session.redirectUrl = request.originalUrl;
+        //     request.flash("error", "You must be logged in to edit a listing!");
+        //     response.redirect("/user/login");
+        //     return;
+        // }
+        let {titleInput, descInput, imageInput, priceInput, locationInput, countryInput} = request.body;
+        const {listingId} = request.params;
+        let image = {
+            filename: "user added this",
+            url: imageInput
+        }
+        let toBeSent = {
+            title: titleInput,
+            description: descInput,
+            image: image,
+            price: priceInput,
+            location: locationInput,
+            country: countryInput
+        }
+        
 
-    const updatedListing =  await Listing.findByIdAndUpdate(
-        listingId,
-        toBeSent,
-        {returnDocument: 'after', runValidators: true}
-    );
-    if (!updatedListing) {
-        return response.status(404).json({message: "Listing Not Found in Database."});
-        // response.render("errors/error.ejs", {error: new expressError(404, "Listing Not Found in Database."), statusCode: 404, message: "Not Found"});
-    }
+        const updatedListing =  await Listing.findByIdAndUpdate(
+            listingId,
+            toBeSent,
+            {returnDocument: 'after', runValidators: true}
+        );
+        if (!updatedListing) {
+            return response.status(404).json({message: "Listing Not Found in Database."});
+            // response.render("errors/error.ejs", {error: new expressError(404, "Listing Not Found in Database."), statusCode: 404, message: "Not Found"});
+        }
 
-    response.status(200).json(updatedListing);
-}));
+        response.status(200).json(updatedListing);
+    }
+));
 
 
 
 // Delete Route: Send a confirmation alert
 router.delete(
     "/:listingId",
+    authenticatedCheck,
     deleteReviewsUponListingDeletion,
     wrapAsync(async (request, response) => {
+        // if (request.isUnauthenticated()) {
+        //     request.session.redirectUrl = request.originalUrl;
+        //     request.flash("error", "You must be logged in to delete a listing!");
+        //     response.redirect("/user/login");
+        //     return;
+        // }
         const {listingId} = request.params;
         const deletedListing = await Listing.findByIdAndDelete(listingId);
 

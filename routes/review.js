@@ -9,18 +9,21 @@ const Review = require("../models/reviewSchema.js")
 
 const reviewSchema_joi = require("../joi_schema/review_schema_joi.js");
 
-// =========================================================================================================
-function validateReviewSchema(request, response, next) {
-    console.log("Request body: ", request.body);
-    const {error} = reviewSchema_joi.validate(request.body);
+// middlewares
+const {validateReviewSchema} = require("../middlewares.js");
 
-    // Invalid schmea route.
-    if (error) {
-        return next(new expressError(400, "JOI_ERROR\nBad Request: Incorrect Schema for Review"));
-    }
-    // Valid Schema route.
-    next();
-}
+// =========================================================================================================
+// function validateReviewSchema(request, response, next) {
+//     console.log("Request body: ", request.body);
+//     const {error} = reviewSchema_joi.validate(request.body);
+
+//     // Invalid schmea route.
+//     if (error) {
+//         return next(new expressError(400, "JOI_ERROR\nBad Request: Incorrect Schema for Review"));
+//     }
+//     // Valid Schema route.
+//     next();
+// }
 // =========================================================================================================
 
 // Post Route
