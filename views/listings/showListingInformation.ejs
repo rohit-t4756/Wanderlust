@@ -9,38 +9,54 @@
                 src="<%= listing.image.url %>" 
                 alt="<%= listing.image.filename %>">
             
-            <div class="row">
-                
+            <div class="row align-items-start">
+                <!-- LEFT COLUMN -->
                 <div class="col-6">
                     <p id="description" style="opacity: 0.9;"><%= listing.description %></p>
                 </div>
                 
-                <div class="col-6 d-flex justify-content-center">
-                    <div class="card showPriceCard">
+                <!-- RIGHT COLUMN -->
+                <!-- This wrapper stacks the existing price card and your new card vertically -->
+                <div class="col-6 d-flex flex-column align-items-center gap-3">
+                    
+                    <!-- Box 1:  Price & Location Card -->
+                    <div class="card showPriceCard m-0">
                         <div class="card-body priceDabba">
-                            <b><p class="card-text" style="font-weight: 600;">&#8377;<%= listing.price %> for 1 night</p></b>
-                            <p class="card-text location-text" style="font-weight: 300; font-size: 0.85rem;">Located in: <%= listing.location %>,&nbsp;<%= listing.country %></p>
+                            <p class="card-text" style="font-weight: 600;">₹<%= listing.price %> for 1 night</p>
+                            <p class="card-text location-text" style="font-weight: 300; font-size: 0.85rem;">
+                                Located in: <%= listing.location %>,&nbsp;<%= listing.country %>
+                            </p>
                         </div>
                     </div>
+
+                    <!-- Box 2: Owner Card -->
+                    <div class="card showPriceCard m-0">
+                        <div class="card-body priceDabba">
+                            <p class="card-text" style="font-weight: 600;">Owned by: <%= listing.owner.firstName, listing.owner.LastName %></p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-            <form action="/listings/<%=listing._id%>/edit" method="get" class="mb-2">
-                <button type="submit" class="btn btn-outline-dark">Edit this listing</button>
-            </form>
-            <form action="/listings/<%= listing._id %>" method="post" id="deleteForm">
-                <button type="submit" class="btn btn-outline-dark">Delete this listing</button>
-            </form>
-            <br>
-            <button 
-                class="btn btn-outline-dark mb-3" 
-                type="button" 
-                data-bs-toggle="collapse" 
-                data-bs-target="#reviewForm" 
-                aria-expanded="true" 
-                aria-controls="reviewForm"
-            >
-                Write a review
-            </button>
+            <div class="buttons">
+                <form action="/listings/<%=listing._id%>/edit" method="get" class="mb-2">
+                    <button type="submit" class="btn btn-outline-dark">Edit this listing</button>
+                </form>
+                <form action="/listings/<%= listing._id %>" method="post" id="deleteForm">
+                    <button type="submit" class="btn btn-outline-dark">Delete this listing</button>
+                </form>
+                <br>
+                <button 
+                    class="btn btn-outline-dark mb-3" 
+                    type="button" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#reviewForm" 
+                    aria-expanded="true" 
+                    aria-controls="reviewForm"
+                >
+                    Write a review
+                </button>
+            </div>
 
             <div class="collapse accordion mb-4" id="reviewForm">
                 <div class="card">
@@ -144,14 +160,17 @@
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
                 });
-
-                if (response.ok) {
+                const contentType = response.headers.get("content-type");
+                if (response.ok && contentType && contentType.includes("application/json")) {
                     const result = await response.json();
-                    console.log("Update successful:", result);
                     window.location.href = '/listings'; 
                 } 
+                else if (response.redirected) {
+                    // If the backend redirected us (e.g., to a login page)
+                    window.location.href = response.url;
+                } 
                 else {
-                    alert("Failed to update listing.");
+                    alert("Failed to delete listing.");
                 }
             } 
             catch (error) {

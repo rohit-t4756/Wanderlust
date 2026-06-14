@@ -1,3 +1,5 @@
+/* ========================================================================= */
+/* 1. GLOBAL STYLES & LAYOUT */
 body {
     font-family: "Plus Jakarta Sans", sans-serif !important;
     display: flex;
@@ -9,34 +11,14 @@ body {
     flex: 1;
 }
 
-/* Navbar */
-
+/* ========================================================================= */
+/* 2. NAVBAR SECTION */
 .navbar {
     height: 6rem;
 }
 
-.user-buttons form button {
-    background-color: #fe424d;
-    outline-color: #fe424d;
-    border-color: #fe424d;
-    color: white;
-    font-weight: 600; 
-    
-    transition: all 0.2s ease-in-out; 
-}
-
-.user-buttons form button:hover {
-    background-color: #e61e4d;
-    border-color: #e61e4d;
-    color: white;
-    
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
-    
-    transform: scale(1.02); 
-}
-
-.user-buttons form button:active {
-    transform: scale(0.98);
+.nav-link {
+    color: #222222 !important;
 }
 
 .fa-compass {
@@ -44,20 +26,154 @@ body {
     color: #fe424d;
 }
 
-.nav-link {
-    color: #222222 !important;
+/* Navbar Buttons */
+.user-buttons form button {
+    background-color: #fe424d;
+    outline-color: #fe424d;
+    border-color: #fe424d;
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
 
-/* Footer */
+.user-buttons form button:hover {
+    background-color: #e61e4d;
+    border-color: #e61e4d;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+}
 
-footer {
+.user-buttons form button:active {
+    transform: scale(0.98);
+}
+
+/* ========================================================================= */
+/* 3. CARDS & GRID LAYOUT */
+.row {
     display: flex;
-    background-color: blanchedalmond;
-    margin-bottom: auto;
+    justify-content: space-evenly;
+    align-items: space-evenly;
+    align-content: center;
+    flex-wrap: wrap;
+    row-gap: 3rem;
+}
+
+.row a {
+    text-decoration: none;
+}
+
+.card {
+    border: none;
+    margin-bottom: 2rem;
+    flex-shrink: 1;
+    min-width: 200px;
+}
+
+.card-img-top {
+    width: 100%;
+    border-radius: 1rem;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 0;
+}
+
+.card-img-overlay {
+    opacity: 0;
+}
+
+.card-img-overlay:hover {
+    opacity: 0.2;
+    background-color: white;
+}
+
+/* ========================================================================= */
+/* 4. CREATE LISTING PAGE */
+.btn-outline-dark {
+    border-color: #fe424d;
+    color: #fe424d;
+}
+
+.btn-outline-dark:hover {
+    border-color: #fe424d;
+    background-color: #fe424d;
+}
+
+/* ========================================================================= */
+/* 5. SHOW LISTING PAGE */
+.showBox {
+    display: flex;
     justify-content: center;
     align-items: center;
     align-content: center;
+}
 
+.showListingImg {
+    height: 40vh;
+    width: 100%;
+    border-radius: 1.5rem;
+    object-fit: cover;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.showListingImg:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.showPriceCard {
+    border: 1px solid #ced4da;
+    width: 90%;
+    height: 80%;
+    padding: 0.4rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.priceDabba {
+    width: fit-content;
+    height: fit-content;
+    padding: 0.5rem;
+}
+
+.location-text {
+    margin-top: 0.1rem;
+    padding-left: 0.4rem;
+}
+
+/* ========================================================================= */
+/* 6. REVIEWS SECTION */
+#reviewForm {
+    border: 1px solid #ced4da;
+    width: 90%;
+    height: 80%;
+    padding: 0.4rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.review-card {
+    border: 1px solid #ced4da;
+    width: 90%;
+    height: 80%;
+    padding: 0.8rem 0.8rem 0.4rem 0.8rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+ /* ========================================================================= */
+ /* 7. FOOTER SECTION */
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    background-color: blanchedalmond;
+    margin-bottom: auto;
     min-height: 0.1rem;
 }
 
@@ -66,7 +182,7 @@ footer {
 }
 
 .f-info-links a {
-    text-decoration: none ;
+    text-decoration: none;
     color: #222222;
 }
 
@@ -88,7 +204,7 @@ footer {
 }
 
 .f-info-socials a {
-    text-decoration: none ;
+    text-decoration: none;
     color: #222222;
     margin: 2px;
 }
@@ -97,130 +213,4 @@ footer {
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 50%;
     box-shadow: 0 0 0 0.5rem rgba(0, 0, 0, 0.1);
-}
-
-/* Cards */
-.row a {
-    text-decoration: none;
-}
-
-.card {
-    border: none;
-    margin-bottom: 2rem;
-
-}
-
-.card-img-top {
-    border-radius: 1rem;
-    width: 100%;
-    object-fit: cover;
-
-}
-
-.card-body {
-    padding: 0;
-}
-
-/* Flex box */
-.row {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: space-evenly;
-    align-content: center;
-
-    flex-wrap: wrap;
-    row-gap: 3rem;
-    /* gap: 1rem; */
-}
-
-.card {
-    flex-shrink: 1;
-    min-width: 200px;
-}
-
-/* Card hover effect */
-.card-img-overlay {
-    opacity: 0;
-}
-
-.card-img-overlay:hover {
-    opacity: 0.2;
-    background-color: white;
-}
-
-/* Create listing page */
-.btn-outline-dark {
-    border-color: #fe424d;
-    color: #fe424d;
-}
-
-.btn-outline-dark:hover {
-    border-color: #fe424d;
-    background-color: #fe424d;
-}
-
-/* Show listing page */
-.showListingImg {
-    height: 40vh; 
-    width: 100%;
-    border-radius: 1.5rem;
-    object-fit: cover;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.05);
-}
-
-.showListingImg:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-}
-
-.showPriceCard {
-    border: 1px solid #ced4da; 
-    width: 90%;
-    height: 80%;
-    padding: 0.4rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.showBox {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-}
-
-.priceDabba {
-    height: fit-content;
-    width: fit-content;
-
-    padding: 0.5rem;
-}
-
-.location-text {
-    margin-top: 0.1rem;
-    padding-left: 0.4rem;
-}
-
-/* Review card */
-.review-card {
-    border: 1px solid #ced4da; 
-    width: 90%;
-    height: 80%;
-    padding-top: 0.8rem;
-    padding-left: 0.8rem;
-    padding-right: 0.8rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Review Form */
-#reviewForm {
-    border: 1px solid #ced4da; /* Slightly thinner border looks more modern */
-    width: 90%; /* Reduced width as requested */
-    height: 80%; /* Allow height to adjust to text */
-    padding: 0.4rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

@@ -1,14 +1,22 @@
+// =========================================================================
+// 1. IMPORTS & DEPENDENCIES
 const express = require("express");
 const passport = require("passport");
 const router = express.Router({ mergeParams: true });
 
-const wrapAsync = require("../utilities/wrapAsync.js")
-const expressError = require('../utilities/expressError.js');
-
+// Custom Utilities & Models
+const wrapAsync = require("../utilities/wrapAsync.js");
 const User = require("../models/userSchema.js");
-const { storeRedirectURL } = require("../middlewares.js");
 
-// SignUp form
+// Custom Middlewares
+const { 
+    storeRedirectURL 
+} = require("../middlewares.js");
+
+// =========================================================================
+// 2. SIGNUP ROUTES
+
+// SignUp Form: Present the registration page to the user
 router.get(
     "/signup",
     (request, response) => {
@@ -16,13 +24,14 @@ router.get(
     }
 );
 
+// Register Route: Process registration details and automatically log the user in
 router.post(
     "/signup",
-    wrapAsync(async (request, response) => {
+    wrapAsync(async (request, response, next) => {
         try {
             console.log("Request body: ", request.body);
             
-            const {email, firstName, lastName, dob, password, confirmPassword} = request.body;
+            const { email, firstName, lastName, dob, password, confirmPassword } = request.body;
             const newUser = new User({
                 email: email,
                 firstName: firstName,
@@ -32,11 +41,13 @@ router.post(
             });
 
             const registeredUser = await User.register(newUser, password);
+            
             request.login(
                 registeredUser, 
                 (error) => {
-                    if (error)
+                    if (error) {
                         return next(error);
+                    }
                     request.flash("success", "New User Registered.\nWelcome to Wanderlust!");
                     response.redirect("/listings");
                 }
@@ -46,16 +57,20 @@ router.post(
             response.redirect("/user/signup");
         }
     })
-)
+);
 
-// Login Form
+// =========================================================================
+// 3. LOGIN ROUTES
+
+// Login Form: Present the login page to the user
 router.get(
     "/login",
     (request, response) => {
         response.render("./users/loginForm.ejs");
     }
-)
+);
 
+// Login Route: Authenticate the user credentials using Passport
 router.post(
     "/login",
     (request, response, next) => {
@@ -63,12 +78,11 @@ router.post(
         next();
     },
     storeRedirectURL,
-    passport.authenticate("local", {failureRedirect: "/user/login", failureFlash: true}),
+    passport.authenticate("local", { failureRedirect: "/user/login", failureFlash: true }),
     wrapAsync(async (request, response) => {
-
         request.flash("success", `Welcome back to Wanderlust!\nIt's nice to have you back!`);
         response.redirect(response.locals.redirectUrl || "/listings");
     })
-)
+);
 
 module.exports = router;
