@@ -1,6 +1,6 @@
 <% layout("/layouts/boilerplate") -%>
 <style>
-    /* Centers the card and gives it a nice feel */
+    /* Centers the card*/
     .signup-card {
         max-width: 500px;
         margin: 2rem auto;
@@ -194,6 +194,7 @@
         }
         else {
             confirmPassword.classList.remove("is-invalid");
+            confirmPassword.classList.add("is-valid");
         }
     })
 </script>

@@ -2,7 +2,7 @@
 <body>
     <br><br>
     <h3>Edit the listing for your property</h3>
-    <form action="/listings/<%= params.id %>/edit" id="editForm">
+    <form action="/listings/<%= listing._id %>/edit?_method=PATCH" method="POST">
 
         <!-- Title input -->
         <div class="mb-3">
@@ -83,7 +83,7 @@
         <button type="submit" class="btn btn-outline-dark">Edit the listing</button>
     </form>
     <br><br><br>
-    <script>
+    <!-- <script>
         const editForm = document.getElementById("editForm");
 
         editForm.addEventListener("submit", async (event) => {
@@ -122,5 +122,5 @@
                 console.error("Error sending PATCH request:", error);
             }
         });
-    </script>
+    </script> -->
 </body>

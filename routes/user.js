@@ -48,7 +48,7 @@ router.post(
                     if (error) {
                         return next(error);
                     }
-                    request.flash("success", "New User Registered.\nWelcome to Wanderlust!");
+                    request.flash("success", "New User Registered. Welcome to Wanderlust!");
                     response.redirect("/listings");
                 }
             );
@@ -80,7 +80,7 @@ router.post(
     storeRedirectURL,
     passport.authenticate("local", { failureRedirect: "/user/login", failureFlash: true }),
     wrapAsync(async (request, response) => {
-        request.flash("success", `Welcome back to Wanderlust!\nIt's nice to have you back!`);
+        request.flash("success", `Welcome back to Wanderlust! It's nice to have you back!`);
         response.redirect(response.locals.redirectUrl || "/listings");
     })
 );

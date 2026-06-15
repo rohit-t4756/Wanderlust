@@ -13,43 +13,12 @@ const listingSchema_joi = require("../joi_schema/listing_schema_joi.js");
 const { 
     validateListingSchema, 
     deleteReviewsUponListingDeletion, 
-    authenticatedCheck 
+    authenticatedCheck, 
+    isListingOwner
 } = require("../middlewares.js");
 
 // =========================================================================
-// 2. INDEX & SHOW ROUTES
-
-// Index Route: Show all the listings
-router.get(
-    "/", 
-    wrapAsync(async (request, response) => {
-        const listingData = await Listing.find({});
-        response.render("listings/allListings.ejs", { listingData });
-    })
-);
-
-// Show Route: Show information for one single listing
-router.get(
-    "/:listingId", 
-    wrapAsync(async (request, response) => {
-        const listingData = await Listing.findById(request.params.listingId)
-            .populate("reviews")
-            .populate("owner");
-
-        if (!listingData) {
-            request.flash("error", "The listing you are looking for does not exist!");
-            return response.redirect("/listings");
-        }
-        
-        response.render("listings/showListingInformation.ejs", { 
-            listing: listingData,
-            requestBody: request,
-        });
-    })
-);
-
-// =========================================================================
-// 3. CREATE ROUTES
+// 2. CREATE ROUTES
 
 // New Listing Route: Present a form to create a new listing
 router.get(
@@ -87,12 +56,45 @@ router.post(
 );
 
 // =========================================================================
+// 3. INDEX & SHOW ROUTES
+
+// Index Route: Show all the listings
+router.get(
+    "/", 
+    wrapAsync(async (request, response) => {
+        const listingData = await Listing.find({});
+        response.render("listings/allListings.ejs", { listingData });
+    })
+);
+
+// Show Route: Show information for one single listing
+router.get(
+    "/:listingId", 
+    wrapAsync(async (request, response) => {
+        const listingData = await Listing.findById(request.params.listingId)
+            .populate("reviews")
+            .populate("owner");
+
+        if (!listingData) {
+            request.flash("error", "The listing you are looking for does not exist!");
+            return response.redirect("/listings");
+        }
+        
+        response.render("listings/showListingInformation.ejs", { 
+            listing: listingData,
+            requestBody: request,
+        });
+    })
+);
+
+// =========================================================================
 // 4. EDIT & UPDATE ROUTES
 
 // Edit Route: Send the HTML form to edit an existing listing
 router.get(
     "/:listingId/edit", 
-    authenticatedCheck, 
+    authenticatedCheck,
+    isListingOwner,
     wrapAsync(async (request, response) => {
         const listingData = await Listing.findById(request.params.listingId);
         const country_list = Object.values(countries).map(c => c.name).sort();
@@ -108,7 +110,8 @@ router.get(
 // Update Route: Process the edited details using PATCH
 router.patch(
     "/:listingId/edit", 
-    authenticatedCheck, 
+    authenticatedCheck,
+    isListingOwner,
     validateListingSchema, 
     wrapAsync(async (request, response) => {
         let { titleInput, descInput, imageInput, priceInput, locationInput, countryInput } = request.body;
@@ -135,10 +138,12 @@ router.patch(
         );
 
         if (!updatedListing) {
-            return response.status(404).json({ message: "Listing Not Found in Database." });
+            request.flash("error", "Listing Not Found in Database.");
+            return response.redirect("/listings");
         }
 
-        response.status(200).json(updatedListing);
+        request.flash("success", "Listing updated successfully!");
+        response.redirect(`/listings/${listingId}`); 
     })
 );
 
@@ -148,17 +153,20 @@ router.patch(
 // Delete Route: Destroy a listing and its matching reviews
 router.delete(
     "/:listingId", 
-    authenticatedCheck, 
+    authenticatedCheck,
+    isListingOwner,
     deleteReviewsUponListingDeletion, 
     wrapAsync(async (request, response) => {
         const { listingId } = request.params;
         const deletedListing = await Listing.findByIdAndDelete(listingId);
 
         if (!deletedListing) {
-            return response.status(404).json({ message: "Listing not found." });
+            request.flash("error", "Listing not found.");
+            return response.redirect("/listings");
         }
 
-        response.status(200).json({ message: "Deleted successfully", deletedListing });
+        request.flash("success", "Listing deleted successfully!");
+        response.redirect("/listings");
     })
 );
 

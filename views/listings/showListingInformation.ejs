@@ -39,12 +39,14 @@
                 </div>
             </div>
             <div class="buttons">
-                <form action="/listings/<%=listing._id%>/edit" method="get" class="mb-2">
-                    <button type="submit" class="btn btn-outline-dark">Edit this listing</button>
-                </form>
-                <form action="/listings/<%= listing._id %>" method="post" id="deleteForm">
-                    <button type="submit" class="btn btn-outline-dark">Delete this listing</button>
-                </form>
+                <% if (requestBody.user && requestBody.user._id.equals(listing.owner._id)) { %>
+                    <form action="/listings/<%=listing._id%>/edit" method="get" class="mb-2">
+                        <button type="submit" class="btn btn-outline-dark">Edit this listing</button>
+                    </form>
+                    <form action="/listings/<%= listing._id %>?_method=DELETE" method="post" class="mb-2">
+                        <button type="submit" class="btn btn-outline-dark">Delete this listing</button>
+                    </form>
+                <% } %>
                 <br>
                 <button 
                     class="btn btn-outline-dark mb-3" 
@@ -142,41 +144,6 @@
                     block: 'start' 
                 });
             });
-        });
-    </script>
-
-    <!-- Listing Delete Button -->
-    <script>
-        const deleteForm = document.getElementById("deleteForm");
-
-        deleteForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const listingId = "<%= listing._id %>";
-            try {
-                const response = await fetch(
-                    `/listings/${listingId}`, 
-                    {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
-                });
-                const contentType = response.headers.get("content-type");
-                if (response.ok && contentType && contentType.includes("application/json")) {
-                    const result = await response.json();
-                    window.location.href = '/listings'; 
-                } 
-                else if (response.redirected) {
-                    // If the backend redirected us (e.g., to a login page)
-                    window.location.href = response.url;
-                } 
-                else {
-                    alert("Failed to delete listing.");
-                }
-            } 
-            catch (error) {
-                console.error("Error sending listing DELETE request:", error);
-                throw new expressError(500, "Something went wrong while sending the listing DELETE request.");
-            }
         });
     </script>
 
