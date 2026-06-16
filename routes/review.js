@@ -3,16 +3,20 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 
-// Custom Utilities & Models
+// Custom Utilities
 const wrapAsync = require("../utilities/wrapAsync.js");
-const Listing = require("../models/listingSchema");
-const Review = require("../models/reviewSchema.js");
 
 // Custom Middlewares
 const { 
     validateReviewSchema, 
     authenticatedCheck 
 } = require("../middlewares.js");
+
+// Controller Imports
+const {
+    POST_createReview,
+    DELETE_review
+} = require("../controllers/reviews.js");
 
 // =========================================================================
 // 2. CREATE ROUTE
@@ -21,23 +25,7 @@ const {
 router.post(
     "/", 
     validateReviewSchema, 
-    wrapAsync(async (request, response) => { 
-        let { review } = request.body;
-        let listingId = request.params.listingId;
-        
-        const newReview = new Review({
-            comment: review.comment,
-            rating: review.rating,
-        });
-
-        let listing = await Listing.findById(listingId);
-        listing.reviews.push(newReview);
-
-        await newReview.save();
-        await listing.save();
-
-        response.redirect(`/listings/${listingId}`);
-    })
+    wrapAsync(POST_createReview)
 );
 
 // =========================================================================
@@ -47,20 +35,7 @@ router.post(
 router.delete(
     "/:reviewId", 
     authenticatedCheck,
-    wrapAsync(async (request, response) => {
-        const listingId = request.params.listingId;
-        const reviewId = request.params.reviewId;
-
-        const deletedReview = await Review.findByIdAndDelete(reviewId);
-        
-        if (!deletedReview) {
-            return response.status(404).json({ success: false, message: "Review not found" });
-        }
-        
-        await Listing.findByIdAndUpdate(listingId, { $pull: { reviews: reviewId } });
-
-        response.status(200).json({ success: true, message: "Review deleted" });
-    })
+    wrapAsync(DELETE_review)
 );
 
 module.exports = router;

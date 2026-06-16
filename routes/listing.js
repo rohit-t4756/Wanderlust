@@ -2,12 +2,9 @@
 // 1. IMPORTS & DEPENDENCIES
 const express = require("express");
 const router = express.Router({ mergeParams: true });
-const { countries } = require('countries-list');
 
 // Custom Utilities & Models
 const wrapAsync = require("../utilities/wrapAsync.js");
-const Listing = require("../models/listingSchema");
-const listingSchema_joi = require("../joi_schema/listing_schema_joi.js");
 
 // Custom Middlewares
 const { 
@@ -17,6 +14,17 @@ const {
     isListingOwner
 } = require("../middlewares.js");
 
+// Controller imports
+const { 
+    GET_listingForm, 
+    POST_listingForm,
+    GET_listings,
+    GET_showListing,
+    GET_editListingForm,
+    PATCH_updateListing,
+    DELETE_listing
+} = require("../controllers/listings.js");
+
 // =========================================================================
 // 2. CREATE ROUTES
 
@@ -24,10 +32,7 @@ const {
 router.get(
     "/new", 
     authenticatedCheck, 
-    (request, response) => {
-        const country_list = Object.values(countries).map(c => c.name).sort();
-        response.render("listings/listingCreation.ejs", { countries: country_list });
-    }
+    GET_listingForm
 );
 
 // Create Route: Create a new listing and add it to the DB
@@ -35,24 +40,7 @@ router.post(
     "/createListing", 
     validateListingSchema, 
     authenticatedCheck, 
-    wrapAsync(async (request, response) => {
-        const formData = request.body;
-        
-        const listing = new Listing({
-            title: formData.titleInput,
-            description: formData.descInput,
-            image: {
-                filename: 'userAddedThis',
-                url: formData.imageInput || "https://unsplash.com"
-            },
-            price: formData.priceInput,
-            location: formData.locationInput,
-            country: formData.countryInput,
-        });
-
-        await listing.save();
-        response.redirect("/listings");
-    })
+    wrapAsync(POST_listingForm)
 );
 
 // =========================================================================
@@ -61,30 +49,13 @@ router.post(
 // Index Route: Show all the listings
 router.get(
     "/", 
-    wrapAsync(async (request, response) => {
-        const listingData = await Listing.find({});
-        response.render("listings/allListings.ejs", { listingData });
-    })
+    wrapAsync(GET_listings)
 );
 
 // Show Route: Show information for one single listing
 router.get(
     "/:listingId", 
-    wrapAsync(async (request, response) => {
-        const listingData = await Listing.findById(request.params.listingId)
-            .populate("reviews")
-            .populate("owner");
-
-        if (!listingData) {
-            request.flash("error", "The listing you are looking for does not exist!");
-            return response.redirect("/listings");
-        }
-        
-        response.render("listings/showListingInformation.ejs", { 
-            listing: listingData,
-            requestBody: request,
-        });
-    })
+    wrapAsync(GET_showListing)
 );
 
 // =========================================================================
@@ -95,16 +66,7 @@ router.get(
     "/:listingId/edit", 
     authenticatedCheck,
     isListingOwner,
-    wrapAsync(async (request, response) => {
-        const listingData = await Listing.findById(request.params.listingId);
-        const country_list = Object.values(countries).map(c => c.name).sort();
-        
-        response.render("listings/editListingForm.ejs", { 
-            params: request.params, 
-            listing: listingData, 
-            countries: country_list 
-        });
-    })
+    wrapAsync(GET_editListingForm)
 );
 
 // Update Route: Process the edited details using PATCH
@@ -113,38 +75,7 @@ router.patch(
     authenticatedCheck,
     isListingOwner,
     validateListingSchema, 
-    wrapAsync(async (request, response) => {
-        let { titleInput, descInput, imageInput, priceInput, locationInput, countryInput } = request.body;
-        const { listingId } = request.params;
-        
-        let image = {
-            filename: "user added this",
-            url: imageInput
-        };
-        
-        let toBeSent = {
-            title: titleInput,
-            description: descInput,
-            image: image,
-            price: priceInput,
-            location: locationInput,
-            country: countryInput
-        };
-
-        const updatedListing = await Listing.findByIdAndUpdate(
-            listingId,
-            toBeSent,
-            { returnDocument: 'after', runValidators: true }
-        );
-
-        if (!updatedListing) {
-            request.flash("error", "Listing Not Found in Database.");
-            return response.redirect("/listings");
-        }
-
-        request.flash("success", "Listing updated successfully!");
-        response.redirect(`/listings/${listingId}`); 
-    })
+    wrapAsync(PATCH_updateListing)
 );
 
 // =========================================================================
@@ -156,18 +87,7 @@ router.delete(
     authenticatedCheck,
     isListingOwner,
     deleteReviewsUponListingDeletion, 
-    wrapAsync(async (request, response) => {
-        const { listingId } = request.params;
-        const deletedListing = await Listing.findByIdAndDelete(listingId);
-
-        if (!deletedListing) {
-            request.flash("error", "Listing not found.");
-            return response.redirect("/listings");
-        }
-
-        request.flash("success", "Listing deleted successfully!");
-        response.redirect("/listings");
-    })
+    wrapAsync(DELETE_listing)
 );
 
 module.exports = router;
