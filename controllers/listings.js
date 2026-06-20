@@ -1,7 +1,8 @@
 // =========================================================================
 // 1. IMPORTS & DEPENDENCIES
 const { countries } = require('countries-list');
-const Listing = require("../models/listingSchema");
+const Listing = require("../models/listingSchema.js");
+const { geocodeWithFallback } = require('../utilities/helpers.js');
 
 
 // =========================================================================
@@ -16,6 +17,13 @@ module.exports.GET_listingForm = (request, response) => {
 // Process the form data and save the new listing to the database
 module.exports.POST_listingForm = async (request, response) => {
     const formData = request.body;
+
+    // Outsourced the Nominatim fetch call to helpers.js file.
+    // We expect the location to be of format [street, area, city/district, state(optional)]
+    let { 
+        coordinates,
+        resolution
+    } = await geocodeWithFallback(formData.locationInput, formData.countryInput);
     
     const listing = new Listing({
         title: formData.titleInput,
@@ -28,6 +36,11 @@ module.exports.POST_listingForm = async (request, response) => {
         location: formData.locationInput,
         country: formData.countryInput,
         owner: request.user._id,
+        geometry: {
+            type: 'Point',
+            coordinates: coordinates,
+            resolution: resolution,
+        },
     });
 
     await listing.save();

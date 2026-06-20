@@ -60,19 +60,12 @@ module.exports.authenticatedCheck = (request, response, next) => {
 
 // Check if User is Owner
 module.exports.isListingOwner = wrapAsync(async (request, response, next) => {
-    console.log("Here1");
     let { listingId } = request.params;
     const listing = await Listing.findById(listingId).populate("owner");
-    console.log("Here2");
-    console.log("response.locals.userData: ", response.locals.userData)
-    console.log("listing.owner._id: ", listing.owner._id);
     if (response.locals.userData && !listing.owner._id.equals(response.locals.userData._id)) {
-        console.log("Here3");
         request.flash("error", "You do not have permission to modify the listing!");
         return response.redirect(`/listings/${listingId}`);
-        // next(new expressError(403, "You do not have permission to modify this listing"));
     }
-    console.log("Here4");
     next();
 });
 

@@ -38,10 +38,12 @@ module.exports.DELETE_review = async (request, response) => {
     const deletedReview = await Review.findByIdAndDelete(reviewId);
     
     if (!deletedReview) {
-        return response.status(404).json({ success: false, message: "Review not found" });
+        request.flash("error", "Review not found.");
+        return response.redirect(`/listings/${listingId}`);
     }
     
     await Listing.findByIdAndUpdate(listingId, { $pull: { reviews: reviewId } });
 
-    response.status(200).json({ success: true, message: "Review deleted" });
+    request.flash("success", "Review deleted successfully!");
+    response.redirect(`/listings/${listingId}`);
 };

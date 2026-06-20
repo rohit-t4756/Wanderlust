@@ -38,8 +38,8 @@ router.get(
 // Create Route: Create a new listing and add it to the DB
 router.post(
     "/createListing", 
-    validateListingSchema, 
     authenticatedCheck, 
+    validateListingSchema,
     wrapAsync(POST_listingForm)
 );
 
